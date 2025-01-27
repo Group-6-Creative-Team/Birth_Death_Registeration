@@ -1,43 +1,27 @@
-import { useState } from 'preact/hooks'
-import preactLogo from './assets/preact.svg'
-import viteLogo from '/vite.svg'
-import './app.css'
 
-export function App() {
-  const [count, setCount] = useState(0)
-
+import { Routes, Route, Navigate } from 'react-router-dom';
+// import Login from './pages/LoginPage.jsx';
+// import AddressRegistration from './pages/district.jsx';
+// import Dashboard from './pages/Dashboard.jsx';
+// import BirthRegistration from './pages/Birth.jsx';
+// import DeathRegistration from './pages/Death.jsx';
+// import PaymentRegistration   from './pages/PaymentMethod.jsx';
+// import ApprovedBirthCertificates from './pages/ApprovedBirth.jsx';
+// import ApprovedDeathCertificates from './pages/ApprovedDeath.jsx';
+function App() {
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} class="logo" alt="Vite logo" />
-        </a>
-        <a href="https://preactjs.com" target="_blank">
-          <img src={preactLogo} class="logo preact" alt="Preact logo" />
-        </a>
-      </div>
-      <h1>Vite + Preact</h1>
-      <div class="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/app.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p>
-        Check out{' '}
-        <a
-          href="https://preactjs.com/guide/v10/getting-started#create-a-vite-powered-preact-app"
-          target="_blank"
-        >
-          create-preact
-        </a>
-        , the official Preact + Vite starter
-      </p>
-      <p class="read-the-docs">
-        Click on the Vite and Preact logos to learn more
-      </p>
-    </>
-  )
+    <Routes>
+      {/* <Route path="/login" element={<Login />} />
+      <Route path="/dashboard" element={<Dashboard />} />
+      <Route path="/address" element={<AddressRegistration />} />
+      <Route path="/birth" element={<BirthRegistration />} />
+      <Route path="/death" element={<DeathRegistration />} />
+      <Route path="/payment-method" element={<PaymentRegistration />} />
+      <Route path="/approved-birth-certificates" element={<ApprovedBirthCertificates />} />
+      <Route path="/approved-death-certificates" element={<ApprovedDeathCertificates />} />
+      <Route path="*" element={<Navigate to="/login" replace />} /> */}
+    </Routes>
+  );
 }
+
+export default App;
