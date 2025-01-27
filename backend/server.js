@@ -2,6 +2,7 @@ import dotenv from 'dotenv';
 dotenv.config();  // Load environment variables here
 import userRoutes from './routes/userRoute.js';
 import birthRoutes from './routes/birthRoute.js';
+import districtRoutes from './routes/districtRoute.js';
 import express from 'express';
 import connectDB from './config/db.js';
 
@@ -32,7 +33,9 @@ app.get('/', (req, res) => {
 });
 
 app.use('/api/users', userRoutes);
+app.use('/api/districts', districtRoutes);
 app.use('/api/birth', birthRoutes);
+
  // Corrected line
 
 app.listen(PORT, () => {
