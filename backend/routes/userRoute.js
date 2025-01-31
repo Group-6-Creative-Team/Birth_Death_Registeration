@@ -6,7 +6,7 @@ import {
     updateUserProfile,
     getAllUsers,
 } from '../controllers/userController.js';
-import { protect, isAdmin } from '../middleware/authMiddleware.js';
+import { protect, isAdmin } from '../middlewares/authMiddleware.js';
 
 const router = express.Router();
 

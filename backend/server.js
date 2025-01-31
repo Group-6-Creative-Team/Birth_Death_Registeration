@@ -2,7 +2,7 @@ import dotenv from 'dotenv';
 dotenv.config();  // Load environment variables here
 import userRoutes from './routes/userRoute.js';
 import express from 'express';
-import connectDB from './config/db.js';
+import connectDB from './database/db.js';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import paymentRoute from './routes/paymentRoute.js';
