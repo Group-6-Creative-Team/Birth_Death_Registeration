@@ -1,6 +1,6 @@
-import Dod from '../models/dodModel.js';
+import Death from '../models/death.js';
 import District from '../models/districtsModel.js';
-import Dob from '../models/dobModel.js'; 
+import Birth from '../models/birth.js';
 import mongoose from 'mongoose';
 
 // Create a new district
@@ -72,7 +72,7 @@ export const deleteDistrict = async (req, res) => {
 
 export const getBirthsAndDeathsByDistrict = async (req, res) => {
   try {
-    const births = await Dob.aggregate([
+    const births = await Birth.aggregate([
       {
         $addFields: {
           placeOfBirth: { $toObjectId: "$placeOfBirth" } // Convert placeOfBirth to ObjectId
@@ -101,7 +101,7 @@ export const getBirthsAndDeathsByDistrict = async (req, res) => {
     ]);
     console.log(births);
 
-    const deaths = await Dod.aggregate([
+    const deaths = await Death.aggregate([
       {
         $addFields: {
           placeOfDeath: { $toObjectId: "$placeOfDeath" } // Convert placeOfDeath to ObjectId

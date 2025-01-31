@@ -6,9 +6,9 @@ const deathSchema = mongoose.Schema({
         
     },
     
-    dob:{
+    birth:{
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Dob',
+        ref: 'Birth',
     },
     image:{
         type: String,

@@ -1,10 +1,15 @@
 import dotenv from 'dotenv';
 dotenv.config();  // Load environment variables here
 import userRoutes from './routes/userRoute.js';
-import birthRoutes from './routes/birthRoute.js';
-import districtRoutes from './routes/districtRoute.js';
 import express from 'express';
 import connectDB from './config/db.js';
+import cors from 'cors';
+import bodyParser from 'body-parser';
+import paymentRoute from './routes/paymentRoute.js';
+import paymentMethod from './routes/paymentMethodRoute.js';
+import districtRoutes from './routes/districtRoute.js';
+import birthRoutes from './routes/birthRoute.js';
+import deathRoutes from './routes/deathRoute.js';
 
 // Connect to the database
 connectDB();
@@ -35,8 +40,9 @@ app.get('/', (req, res) => {
 app.use('/api/users', userRoutes);
 app.use('/api/districts', districtRoutes);
 app.use('/api/birth', birthRoutes);
-
- // Corrected line
+app.use('/api/death', deathRoutes);
+app.use('/api/payment-methods', paymentMethod);
+app.use('/api/payments', paymentRoute); // Corrected line
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);

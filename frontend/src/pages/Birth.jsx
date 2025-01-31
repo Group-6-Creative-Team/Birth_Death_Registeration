@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
 import DashboardLayout from '../components/layout.jsx';
-import ViewRecordModal from '../components/ViewRecordModal.jsx';
-import { Plus, Trash2, Edit, Eye } from 'lucide-react';
-import { createDobRecord, deleteDobRecord, updateDobRecord, fetchPendingDobRecords ,fetchBirthRecordDetails } from '../services/dobService.js';
+//import ViewRecordModal from '../components/ViewRecordModal.jsx';
+import {  Trash2, Edit } from 'lucide-react';
+import { createDobRecord, deleteDobRecord, updateDobRecord, fetchPendingDobRecords  } from '../services/dobService.js';
 import { getAllDistricts } from '../services/districtService.js';
 import PaymentModal from '../components/PaymentModel.jsx';
 import { updatePaymentStatus } from '../services/paymentService.js';
 import toast, { Toaster } from 'react-hot-toast';
-import CertificateDetails from '../components/BirthCertificate.jsx'; // Importing the BirthCertificate component
+//import CertificateDetails from '../components/BirthCertificate.jsx'; // Importing the BirthCertificate component
 
 export default function BirthRegistration() {
   const [records, setRecords] = useState([]);
@@ -31,8 +31,8 @@ export default function BirthRegistration() {
   const [isPaymentModalVisible, setIsPaymentModalVisible] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState(null);
   // const [isViewModalVisible, setIsViewModalVisible] = useState(false); 
-  const [viewRecord, setViewRecord] = useState(null);
-  const [showCertificateModal, setShowCertificateModal] = useState(false);
+  // const [viewRecord, setViewRecord] = useState(null);
+  // const [showCertificateModal, setShowCertificateModal] = useState(false);
 
   useEffect(() => {
     fetchPendingDobRecords()
@@ -80,27 +80,31 @@ export default function BirthRegistration() {
     const hasNumbers = /\d/.test(input);
     return !hasNumbers; // Return true if there are no numbers
   }
-    const handleAddRecord = async (e) => {
+  const handleAddRecord = async (e) => {
     e.preventDefault();
     console.log("Form submitted");
     const { fullName, dob, gender, materialState, motherName, placeOfBirth, occupation, address } = formData;
 
     console.log("Form Data:", formData);
     // Check if all required fields are filled
-    if (!fullName || !dob || !gender || !materialState || !motherName || !placeOfBirth || !occupation || !address || !image) {
-      toast.error("Please fill all required fields and upload an image.");
+    if (!fullName || !dob || !gender || !materialState || !motherName || !placeOfBirth || !occupation || !address) {
+      toast.error("Please fill all required fields.");
       return; // Prevent proceeding
     }
+  
+    if (!image) {
+      toast.error("Please upload an image.");
+      return; // Prevent proceeding
+    }
+  
     try {
-      let base64Image = null;
-      if (image) {
-          const reader = new FileReader();
-          reader.readAsDataURL(image);
-          base64Image = await new Promise((resolve) => {
-              reader.onload = () => resolve(reader.result);
-          });
+      let base64Image = await convertImageToBase64(image);
+  
+      if (!base64Image) {
+        toast.error("Image processing failed. Please try again.");
+        return;
       }
-
+  
       const newRecord = {
           fullName,
           dob,
@@ -119,7 +123,7 @@ export default function BirthRegistration() {
           setRecords(records.map((record) => (record._id === editingId ? { ...record, ...newRecord } : record)));
           setEditingId(null);
       } else {
-          const createdRecord = await createDobRecord(newRecord); // Handle any errors here
+          const createdRecord = await createDobRecord(newRecord);
           setRecords([...records, createdRecord]);
       }
 
@@ -127,9 +131,20 @@ export default function BirthRegistration() {
       toast.success(editingId ? "Record updated successfully!" : "Record added successfully!");
     } catch (error) {
         console.error("Error creating or updating record:", error);
-        toast.error("Failed to save record."); // Notify user on failure
+        toast.error("Failed to save record.");
     }
 };
+
+// Convert image to base64 before setting it in state
+const convertImageToBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = (error) => reject(error);
+    });
+};
+
 
 
   const handleEditRecord = (record) => {
@@ -162,31 +177,31 @@ export default function BirthRegistration() {
   //   setIsViewModalVisible(true);
   // };
 
-  const handleViewRecordClick = async (record) => {
-    try {
-      const dobDetails = await fetchBirthRecordDetails(record._id); // Call the new service function
+  // const handleViewRecordClick = async (record) => {
+  //   try {
+  //     const dobDetails = await fetchBirthRecordDetails(record._id); // Call the new service function
 
-      setViewRecord({
-        fullName: dobDetails.fullName || 'N/A',
-        dateOfBirth: dobDetails.dob || 'N/A',
-        placeOfBirth: dobDetails.placeOfBirth || 'N/A',
-        idNumber: dobDetails.dobId || 'N/A',
-        gender: dobDetails.gender || 'N/A',
-        maritalStatus: dobDetails.materialState|| 'N/A',
-        address: dobDetails.address || 'N/A',
-        motherName: dobDetails.motherName || 'N/A',
-        dateOfIssue: dobDetails.dateOfIssue || 'N/A',
-        occupation: dobDetails.occupation || 'N/A',
-        photo: dobDetails.image || '/placeholder.svg',
-        mayorName: 'Cumar Maxamuud Maxamed',
+  //     setViewRecord({
+  //       fullName: dobDetails.fullName || 'N/A',
+  //       dateOfBirth: dobDetails.dob || 'N/A',
+  //       placeOfBirth: dobDetails.placeOfBirth || 'N/A',
+  //       idNumber: dobDetails.dobId || 'N/A',
+  //       gender: dobDetails.gender || 'N/A',
+  //       maritalStatus: dobDetails.materialState|| 'N/A',
+  //       address: dobDetails.address || 'N/A',
+  //       motherName: dobDetails.motherName || 'N/A',
+  //       dateOfIssue: dobDetails.dateOfIssue || 'N/A',
+  //       occupation: dobDetails.occupation || 'N/A',
+  //       photo: dobDetails.image || '/placeholder.svg',
+  //       mayorName: 'Cumar Maxamuud Maxamed',
         
-      });
+  //     });
 
-      setShowCertificateModal(true); // Open the certificate modal directly
-    } catch (error) {
-      console.error("Error fetching birth record:", error);
-    }
-  };
+  //     setShowCertificateModal(true); // Open the certificate modal directly
+  //   } catch (error) {
+  //     console.error("Error fetching birth record:", error);
+  //   }
+  // };
 
   const resetForm = () => {
     setFormData({

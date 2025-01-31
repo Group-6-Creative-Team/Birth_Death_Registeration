@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import DashboardLayout from '../components/layout';
 import { Edit, Trash2, Plus } from 'lucide-react';
-import { getAllPaymentMethods } from '../services/paymentMethodService'; // Assuming you have this function
+import { getAllPaymentMethods ,createPaymentMethod, updatePaymentMethod } from '../services/paymentMethodService'; // Assuming you have this function
 
 export default function PaymentRegistration() {
   const [showForm, setShowForm] = useState(false);
@@ -35,27 +35,37 @@ export default function PaymentRegistration() {
     }
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
 
-    if (newMethod.methodName && newMethod.receiverNumber && newMethod.amount) {
-      if (editingId) {
-        // Update existing record
-        setMethods((prev) =>
-          prev.map((method) =>
-            method._id === editingId ? { ...method, ...newMethod } : method
-          )
-        );
-        setEditingId(null); // Clear editing state
-      } else {
-        // Add new record
-        setMethods((prev) => [...prev, { id: Date.now(), ...newMethod }]);
-      }
-      // Reset form
-      setNewMethod({ methodName: '', receiverNumber: '+252-', amount: '' });
-      setShowForm(false); // Close form after save
+const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  if (!newMethod.methodName || !newMethod.receiverNumber || !newMethod.amount) {
+    console.error("Please fill all fields.");
+    return;
+  }
+
+  try {
+    if (editingId) {
+      // Update existing payment method in the backend
+      await updatePaymentMethod(editingId, newMethod);
+    } else {
+      // Send new payment method to backend
+      const savedMethod = await createPaymentMethod(newMethod);
+      setMethods((prev) => [...prev, savedMethod]); // Add it to the list
     }
-  };
+
+    setEditingId(null); // Clear editing state
+    setNewMethod({ methodName: '', receiverNumber: '+252-', amount: '' });
+    setShowForm(false); // Close form after save
+
+    // Re-fetch payment methods from the backend to ensure UI updates correctly
+    const updatedMethods = await getAllPaymentMethods();
+    setMethods(updatedMethods);
+  } catch (error) {
+    console.error("Error saving payment method:", error);
+  }
+};
+
 
   const handleDelete = (id) => {
     setMethods((prev) => prev.filter((method) => method._id !== id));
@@ -148,8 +158,9 @@ export default function PaymentRegistration() {
                 </tr>
               </thead>
               <tbody>
-                {methods.map((method) => (
-                  <tr key={method._id} className="border-b last:border-b-0">
+                {methods.map((method, index) => (
+                  <tr key={method._id || index} className="border-b last:border-b-0">
+
                     <td className="py-3 px-4">{method.methodName}</td>
                     <td className="py-3 px-4">{method.receiverNumber}</td>
                     <td className="py-3 px-4">${method.amount}</td>

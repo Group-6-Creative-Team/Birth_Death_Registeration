@@ -22,10 +22,10 @@ export const createBirthRecord = async (req, res) => {
     }
 
     // Find the last record and calculate new birthId
-    const lastRecord = await Birth.findOne().sort({ birthId: -1 });
-    const newBirthId = lastRecord && lastRecord.birthId ? lastRecord.birthId + 1 : 101;
+    const lastRecord = await Birth.findOne().sort({ dobId: -1 });
+    const newdobId = lastRecord && lastRecord.dobId ? lastRecord.dobId + 1 : 101;
 
-    if (isNaN(newBirthId)) {
+    if (isNaN(newdobId)) {
       console.error("Error: birthId is NaN");
       return res.status(500).json({ message: "Failed to generate a valid birthId" });
     }
@@ -38,7 +38,7 @@ export const createBirthRecord = async (req, res) => {
       return res.status(400).json({ message: 'Image must be a string' });
     }
     const newBirth = new Birth({
-      birthId: newBirthId,
+      dobId: newdobId,
       fullName,
       image,
       placeOfBirth: placeOfBirthDistrict._id,

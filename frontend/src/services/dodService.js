@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:9000/api/dod'; // Adjust base URL if needed
+const API_URL = 'http://localhost:9000/api/death'; // Adjust base URL if needed
 
 // Fetch all Dod records
 export const fetchAllDodRecords = async () => {

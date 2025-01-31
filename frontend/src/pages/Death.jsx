@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import DashboardLayout from '../components/layout';
-import { Eye, Edit, Trash2, Plus } from 'lucide-react';
+import { Edit, Trash2, Plus } from 'lucide-react';
 import PaymentModal from '../components/PaymentModel';
 import toast, { Toaster } from 'react-hot-toast';
-import { fetchPendingDodRecords, deleteDodRecord, createDodRecord, updateDodRecord ,getDodRecordById , fetchDodRecordDetails} from '../services/dodService';
+import { fetchPendingDodRecords, deleteDodRecord, createDodRecord, updateDodRecord } from '../services/dodService';
 import { getAllDistricts } from '../services/districtService';
 import { getAllDobRecords } from '../services/dobService';
 import Select from 'react-select';
@@ -29,7 +29,7 @@ export default function DeathRegistration() {
   const [selectedRecord, setSelectedRecord] = useState(null);
   // const [viewRecord, setViewRecord] = useState(null);
   const [districtMap, setDistrictMap] = useState({});
-  const [showCertificateModal, setShowCertificateModal] = useState(false);
+  // const [showCertificateModal, setShowCertificateModal] = useState(false);
   // const [isDeathCertificateVisible, setIsDeathCertificateVisible] = useState(false);
 
 
@@ -67,37 +67,49 @@ export default function DeathRegistration() {
     }
   };
 
+
   // const handleSubmit = async (e) => {
   //   e.preventDefault();
-  //   const { dob, dateOfDeath, causeOfDeath, placeOfDeath, image } = newRecord;
-
+  //   const { dob, dateOfDeath, causeOfDeath, placeOfDeath } = newRecord;
+  
+  //   // Check if essential fields are filled
   //   if (!dob || !dateOfDeath || !causeOfDeath || !placeOfDeath) {
   //     toast.error("Please fill in all fields.");
   //     return;
   //   }
-
+  
   //   try {
-  //     let base64Image = imagePreview; // Use existing image if no new upload
-  //     if (image) {
+  //     let base64Image = null; // Initialize with null
+  
+  //     // Check if a new image was uploaded
+  //     if (newRecord.image) {
   //       const reader = new FileReader();
-  //       reader.readAsDataURL(image);
-  //       base64Image = await new Promise((resolve) => {
+  //       reader.readAsDataURL(newRecord.image);
+  //       base64Image = await new Promise((resolve, reject) => {
   //         reader.onload = () => resolve(reader.result);
+  //         reader.onerror = reject; // Handle the error if reading fails
   //       });
+  //     } else {
+  //       // If no new image is provided, use the existing image
+  //       const existingRecord = records.find(record => record._id === editingId);
+  //       base64Image = existingRecord?.image; // Use the existing image if available
   //     }
-
+  
+  //     // Prepare payload for submission
   //     const payload = { dob, dateOfDeath, causeOfDeath, placeOfDeath, image: base64Image };
   //     let updatedRecords;
-
+  
   //     if (editingId) {
   //       await updateDodRecord(editingId, payload);
   //       updatedRecords = records.map((record) => (record._id === editingId ? { ...record, ...payload } : record));
   //       setEditingId(null);
+        
   //     } else {
   //       const createdRecord = await createDodRecord(payload);
   //       updatedRecords = [...records, createdRecord];
   //     }
-
+  
+  //     // Update state after submission
   //     setRecords(updatedRecords);
   //     setNewRecord({ dob: '', dateOfDeath: '', causeOfDeath: '', placeOfDeath: '', image: null });
   //     setImagePreview('');
@@ -108,49 +120,49 @@ export default function DeathRegistration() {
   //     toast.error("Failed to save record.");
   //   }
   // };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     const { dob, dateOfDeath, causeOfDeath, placeOfDeath } = newRecord;
   
-    // Check if essential fields are filled
     if (!dob || !dateOfDeath || !causeOfDeath || !placeOfDeath) {
       toast.error("Please fill in all fields.");
       return;
     }
   
     try {
-      let base64Image = null; // Initialize with null
-  
-      // Check if a new image was uploaded
+      let base64Image = null;
       if (newRecord.image) {
         const reader = new FileReader();
         reader.readAsDataURL(newRecord.image);
-        base64Image = await new Promise((resolve, reject) => {
+        base64Image = await new Promise((resolve) => {
           reader.onload = () => resolve(reader.result);
-          reader.onerror = reject; // Handle the error if reading fails
         });
       } else {
-        // If no new image is provided, use the existing image
-        const existingRecord = records.find(record => record._id === editingId);
-        base64Image = existingRecord?.image; // Use the existing image if available
+        const existingRecord = records.find((record) => record._id === editingId);
+        base64Image = existingRecord?.image;
       }
   
-      // Prepare payload for submission
-      const payload = { dob, dateOfDeath, causeOfDeath, placeOfDeath, image: base64Image };
-      let updatedRecords;
+      // ✅ Fix: Change `dob` to `birth` before sending
+      const payload = { 
+        birth: dob,  // ✅ Send `birth` instead of `dob`
+        dateOfDeath, 
+        causeOfDeath, 
+        placeOfDeath, 
+        image: base64Image 
+      };
   
+      let updatedRecords;
       if (editingId) {
         await updateDodRecord(editingId, payload);
-        updatedRecords = records.map((record) => (record._id === editingId ? { ...record, ...payload } : record));
+        updatedRecords = records.map((record) =>
+          record._id === editingId ? { ...record, ...payload } : record
+        );
         setEditingId(null);
-        
       } else {
         const createdRecord = await createDodRecord(payload);
         updatedRecords = [...records, createdRecord];
       }
   
-      // Update state after submission
       setRecords(updatedRecords);
       setNewRecord({ dob: '', dateOfDeath: '', causeOfDeath: '', placeOfDeath: '', image: null });
       setImagePreview('');
@@ -161,6 +173,7 @@ export default function DeathRegistration() {
       toast.error("Failed to save record.");
     }
   };
+  
   const handlePendingPaymentClick = (record) => {
     setSelectedRecord({
       ...record,
@@ -220,7 +233,7 @@ export default function DeathRegistration() {
       setRecords(records.filter((record) => record._id !== id));
       toast.success("Record deleted successfully!");
     } catch (error) {
-      toast.error("Error deleting record. Please try again.");
+      toast.error("Error deleting record. Please try again." + error);
     }
   };
 

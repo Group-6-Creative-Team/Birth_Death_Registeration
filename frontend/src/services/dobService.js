@@ -1,7 +1,7 @@
 // dobService.js
 import axios from 'axios';
 
-const DOB_API_URL = 'http://localhost:9000/api/dob';
+const DOB_API_URL = 'http://localhost:9000/api/birth';
 
 // Create a new DOB record
 // export const createDobRecord = async (dobData) => {

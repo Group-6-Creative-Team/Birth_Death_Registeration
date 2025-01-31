@@ -1,6 +1,6 @@
 import Payment from '../models/paymentModel.js';
-import Dob from '../models/dobModel.js';
-import Dod from '../models/dodModel.js';
+import Birth from '../models/birth.js';
+import Death from '../models/death.js';
 import PaymentMethod from '../models/paymentMethod.js';
 import mongoose from 'mongoose';
 // Create a new payment based on birth or death certificate
@@ -61,9 +61,9 @@ export const createPayment = async (req, res) => {
         // Validate PaymentType and certificate_Id
         let recordExists;
         if (PaymentType === 'Birth Certificate') {
-            recordExists = await Dob.findById(certificate_Id);
+            recordExists = await Birth.findById(certificate_Id);
         } else if (PaymentType === 'Death Certificate') {
-            recordExists = await Dod.findById(certificate_Id);
+            recordExists = await Death.findById(certificate_Id);
         }
 
         if (!recordExists) {
@@ -161,18 +161,18 @@ export const updatePaymentStatus = async (req, res) => {
 
         if (PaymentType === 'Birth Certificate') {
             // Find and update Dob record
-            const birthRecord = await Dob.findById(certificate_Id);
+            const birthRecord = await Birth.findById(certificate_Id);
             if (!birthRecord) {
                 return res.status(404).json({ message: "Birth certificate record not found." });
             }
-            updatedRecord = await Dob.findByIdAndUpdate(certificate_Id, { paymentStatus: 1 }, { new: true }).populate('placeOfBirth', 'discName');
+            updatedRecord = await Birth.findByIdAndUpdate(certificate_Id, { paymentStatus: 1 }, { new: true }).populate('placeOfBirth', 'discName');
         } else if (PaymentType === 'Death Certificate') {
             // Find and update Dod record
-            const deathRecord = await Dod.findById(certificate_Id);
+            const deathRecord = await Death.findById(certificate_Id);
             if (!deathRecord) {
                 return res.status(404).json({ message: "Death certificate record not found." });
             }
-            updatedRecord = await Dod.findByIdAndUpdate(certificate_Id, { paymentStatus: 1 }, { new: true }).populate('dob', 'fullName').populate('placeOfDeath', 'discName');
+            updatedRecord = await Death.findByIdAndUpdate(certificate_Id, { paymentStatus: 1 }, { new: true }).populate('birth', 'fullName').populate('placeOfDeath', 'discName');
         }
 
         res.status(200).json({ message: "Payment status updated successfully", updatedRecord });
